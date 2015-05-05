@@ -45,12 +45,12 @@ int main(int argc, char *argv[]) {
     }
     //salida = argv[optind];
 
-    if (columna > 9 || columna < 0) {
+    if (columna > 3 || columna < 0) {
         printf("Error parametro columna\n");
         exit(1);
     }
 
-    if (fila > 3 || fila < 0) {
+    if (fila > 9 || fila < 0) {
         printf("Error parametro fila\n");
         exit(1);
     }
