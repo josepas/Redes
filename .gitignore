@@ -27,8 +27,8 @@
 *.i*86
 *.x86_64
 *.hex
-servidor
-cliente
+Proyecto1/servidor
+Proyecto1/cliente
 
 # Debug files
 *.dSYM/
