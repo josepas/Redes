@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
 
     if (columna > 3 || columna < 0) {
         printf("Error parametro columna\n");
+        printf("%d\n", columna );
         exit(1);
     }
 
