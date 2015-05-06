@@ -8,15 +8,13 @@
 int main(int argc, char *argv[]) {
 
     int c;
-    int fila, columna;
-    char* puertoS;
-
+    int fila = -1, columna = -1, puertoS = 7000;
    
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
         switch (c) {
             case 'h':
-                printf("reserva_bol_cli <ip-servidor> [-p puerto de servicio] [-f fila] [-c columna]\n");
+                printf("reserva_bol_ser [-f fila] [-c columna] [-p puerto de servicio]\n");
                 printf("\n");
                 printf("-h  Muestra esta informacion de uso.\n");
                 printf("-p  puerto por el cual el cliente enviara la peticion.\n");
@@ -24,13 +22,13 @@ int main(int argc, char *argv[]) {
                 printf("-c  columna que el cliente desea reservar.\n");
                 exit(0);
             case 'p':
-                puertoS = optarg;
+                puertoS = atoi(optarg);
                 break;
             case 'f':
-                fila = atoi(optarg);
+                fila = atoi(optarg) - 1;
                 break;
             case 'c':
-                columna = atoi(optarg);
+                columna = atoi(optarg) - 1;
                 break;
             case '?':
                 if (optopt == 'p')
@@ -45,5 +43,23 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
     }
-    salida = argv[optind];
+    
+    if (columna > 3 || columna < 0) {
+        printf("Error parametro columna\n");
+        exit(1);
+    }
+
+    if (fila > 9 || fila < 0) {
+        printf("Error parametro fila\n");
+        exit(1);
+    }
+
+    if (puertoS > 65535 || puertoS < 1025) {
+        printf("Error parametro puerto\n");
+        exit(1);
+    }
+
+    // FLAG
+    printf("Puerto: %d. fila: %d. columna: %d\n", puertoS, fila, columna);
+    return 0;
 }

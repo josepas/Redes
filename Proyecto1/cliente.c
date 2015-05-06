@@ -6,7 +6,7 @@
 int main(int argc, char *argv[]) {
 
     int c;
-    int fila, columna, puertoS;
+    int fila = -1, columna = -1, puertoS = -1;
     char* ipServidor = argv[1];
 
  
