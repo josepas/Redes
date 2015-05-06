@@ -3,12 +3,24 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+
 
 
 int main(int argc, char *argv[]) {
 
     int c;
     int fila = -1, columna = -1, puertoS = 7000;
+
+    int fd, nuevoCliente;
+    socklen_t tamCliente;
+
+
+
+    struct sockaddr_in servDir, clienteDir;
    
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
@@ -61,5 +73,38 @@ int main(int argc, char *argv[]) {
 
     // FLAG
     printf("Puerto: %d. fila: %d. columna: %d\n", puertoS, fila, columna);
+
+    // crear el socket
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    //printf("%d\n", fd);
+
+    // "Darle un nombre al socket
+    servDir.sin_family = AF_INET;
+    servDir.sin_addr.s_addr = INADDR_ANY;
+    servDir.sin_port = htons(puertoS); 
+    bind(fd, (struct sockaddr *)&servDir, sizeof(servDir));
+
+    // Escuchar por las conexiones
+    // parametro es la cantidad de peticiones que se pueden encolar
+    listen(fd, 40);
+
+    nuevoCliente = accept(fd, (struct sockaddr *) &clienteDir, &tamCliente);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return 0;
 }

@@ -3,12 +3,22 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+    
+
 int main(int argc, char *argv[]) {
 
     int c;
     int fila = -1, columna = -1, puertoS = -1;
     char* ipServidor = argv[1];
 
+    struct sockaddr_in servDir;
+    int fd;
  
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
@@ -63,5 +73,33 @@ int main(int argc, char *argv[]) {
 
     // FLAG
     printf("ipServidor: %s. puerto: %d. fila: %d. columna: %d\n", ipServidor, puertoS, fila, columna);
+
+    // af_inet ipv4
+    // stream TCP
+    // 0 se adecua a ipv4 y tcp
+    fd = socket(AF_INET, SOCK_STREAM, 0);
+    printf("%d---\n", fd);
+
+    servDir.sin_family = AF_INET;
+    servDir.sin_port = htons(5000); 
+
+    inet_pton(AF_INET, ipServidor, &servDir.sin_addr);
+        
+    connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     return 0;
 }
