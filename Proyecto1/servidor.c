@@ -98,7 +98,6 @@ int main(int argc, char *argv[]) {
         memset(buffer, 0, sizeof(buffer));
         
         if (vagon[i][j] == 0) {
-            printf("Reservado! %d-%d\n", i, j);
             vagon[i][j] = 1;
             buffer[0] = '0';
             buffer[1] = '\n';

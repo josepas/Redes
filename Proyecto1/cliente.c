@@ -76,8 +76,8 @@ int main(int argc, char *argv[]) {
     }
 
     if (puertoS > 65535 || puertoS < 1025) {
-            printf("Error parametro puerto\n");
-            exit(1);
+        printf("Error parametro puerto\n");
+        exit(1);
     }
 
     atendido = 1;
@@ -113,6 +113,7 @@ int main(int argc, char *argv[]) {
                 printf(" %*d  ", 2, i+1);
                 for (j = 0; j < 4; ++j) {
                     buffer[cbuff] == '0' ? printf("\x1b[32m" "%c ", buffer[cbuff]) : printf("\x1b[31m" "X ");
+                    printf("\x1b[0m");
                     ++cbuff;
                 }
                 printf("\n");
@@ -125,10 +126,7 @@ int main(int argc, char *argv[]) {
                 printf("Elija un nuevo asiento (fila columna): ");
                 scanf("%d %d", &fila, &columna);
             }
-
-
             close(fd);
-            
 
         } else if (buffer[0] == '2') {
             printf("El vagon se encuntra lleno, intente en otro viaje.\n");
