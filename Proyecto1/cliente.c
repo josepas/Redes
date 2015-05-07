@@ -10,11 +10,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-    
-
 int main(int argc, char *argv[]) {
 
-    int c;
+    int c, i, j;
     int fila = -1, columna = -1, puertoS = -1;
     char* ipServidor = argv[1];
 
@@ -22,6 +20,7 @@ int main(int argc, char *argv[]) {
     int fd;
 
     char buffer[50];
+    int cbuff;
  
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
@@ -56,7 +55,6 @@ int main(int argc, char *argv[]) {
                 exit(1);
         }
     }
-    //salida = argv[optind];
 
     if (columna > 3 || columna < 0) {
         printf("Error parametro columna\n");
@@ -74,17 +72,10 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // FLAG
-    printf("ipServidor: %s. puerto: %d. fila: %d. columna: %d\n", ipServidor, puertoS, fila, columna);
-
-    // af_inet ipv4
-    // stream TCP
-    // 0 se adecua a ipv4 y tcp
     fd = socket(AF_INET, SOCK_STREAM, 0);
 
     servDir.sin_family = AF_INET;
     servDir.sin_port = htons(puertoS); 
-
     inet_pton(AF_INET, ipServidor, &servDir.sin_addr);
         
     connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
@@ -95,21 +86,25 @@ int main(int argc, char *argv[]) {
 
     memset(buffer, 0, sizeof(buffer));
     read(fd, buffer, sizeof(buffer));
-    printf("%s", buffer);
 
+    if (buffer[0] == '0') {
+        printf("El puesto solicitado fila:%d Columna:%d ha sido reservado con exito!\n", fila + 1, columna + 1);
+        
+    } else if (buffer[0] == '1') {
+        printf("El puesto solicitado no esta disponible.\n");
+        printf("Acontinuacion, los puestos disponibles:\n");
+        cbuff = 1;
+        for (i = 0; i < 10; ++i) {
+            for (j = 0; j < 4; ++j) {
+                buffer[cbuff] == '0' ? printf("\x1b[32m" "%c", buffer[cbuff]) : printf("\x1b[31m" "%c", buffer[cbuff]);
+                ++cbuff;
+            }
+            printf("\n");
+        }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    } else if (buffer[0] == '2') {
+        printf("El vagon se encuntra lleno, intente en otro viaje.\n");
+    }
 
     return 0;
 }

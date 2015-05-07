@@ -9,8 +9,6 @@
 #include <netdb.h>
 #include <netinet/in.h>
 
-
-
 int main(int argc, char *argv[]) {
 
     int c, i, j;
@@ -21,8 +19,6 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in servDir, clienteDir;
 
     char buffer[50];
-    //int* nbuff;
-    //char* aux;
 
     int vagon[10][4];
     int contador = 40;
@@ -32,7 +28,6 @@ int main(int argc, char *argv[]) {
         for (j = 0; j < 4; ++j)
             vagon[i][j] = 0;
 
-   
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
         switch (c) {
@@ -82,21 +77,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    // FLAG
-    printf("Puerto: %d. fila: %d. columna: %d\n", puertoS, fila, columna);
-
-    // crear el socket
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    //printf("%d\n", fd);
 
-    // "Darle un nombre al socket
     servDir.sin_family = AF_INET;
     servDir.sin_addr.s_addr = INADDR_ANY;
     servDir.sin_port = htons(puertoS); 
     bind(fd, (struct sockaddr *)&servDir, sizeof(servDir));
 
-    // Escuchar por las conexiones
-    // parametro es la cantidad de peticiones que se pueden encolar
     listen(fd, 40);
 
     while (1) {
@@ -106,14 +93,12 @@ int main(int argc, char *argv[]) {
         read(nuevoCliente, buffer, sizeof(buffer));
 
         i = atoi(strtok(buffer," "));
-        printf("%d--", i);
         j = atoi(strtok(NULL," "));
-        printf("%d--\n", j);
 
         memset(buffer, 0, sizeof(buffer));
         
         if (vagon[i][j] == 0) {
-            printf("reservado!\n");
+            printf("Reservado! %d-%d\n", i, j);
             vagon[i][j] = 1;
             buffer[0] = '0';
             buffer[1] = '\n';
@@ -121,7 +106,7 @@ int main(int argc, char *argv[]) {
             write(nuevoCliente, buffer, 2);
 
         } else if (contador) {
-            printf("Ocupado!\n");
+            printf("Ocupado! %d-%d\n", i, j);
             buffer[0] = '1';
             cbuff = 1;
             for (i = 0; i < 10; ++i) {
@@ -134,28 +119,12 @@ int main(int argc, char *argv[]) {
             write(nuevoCliente, buffer, sizeof(buffer));
 
         } else {
-            printf("Lleno!\n");
+            printf("Vagon lleno!\n");
             buffer[0] = '2';
             buffer[1] = '\n';
             write(nuevoCliente, buffer, 2);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     return 0;
