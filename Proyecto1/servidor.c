@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -12,15 +13,24 @@
 
 int main(int argc, char *argv[]) {
 
-    int c;
+    int c, i, j;
     int fila = -1, columna = -1, puertoS = 7000;
 
     int fd, nuevoCliente;
     socklen_t tamCliente;
-
-
-
     struct sockaddr_in servDir, clienteDir;
+
+    char buffer[50];
+    int* nbuff;
+    //char* aux;
+
+    int vagon[10][4];
+    int contador = 40;
+
+    for (i = 0; i < 10; ++i) 
+        for (j = 0; i < 4; ++i)
+            vagon[i][j] = 0;
+
    
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
@@ -89,6 +99,28 @@ int main(int argc, char *argv[]) {
     listen(fd, 40);
 
     nuevoCliente = accept(fd, (struct sockaddr *) &clienteDir, &tamCliente);
+
+    read(nuevoCliente, buffer, sizeof(buffer));
+    printf("%s\n", buffer);
+
+    i = atoi(strtok(buffer," "));
+    printf("%d--", i);
+    j = atoi(strtok(NULL," "));
+    printf("%d--", j);
+
+    if (vagon[i][j] == 0) {
+        nbuff = 0;
+        write(nuevoCliente, &nbuff, sizeof(nbuff));
+        
+
+    } else if (contador) {
+
+
+
+    } else {
+        //write(nuevoCliente, )
+    }
+
 
 
 

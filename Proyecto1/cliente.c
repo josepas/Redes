@@ -19,6 +19,8 @@ int main(int argc, char *argv[]) {
 
     struct sockaddr_in servDir;
     int fd;
+
+    char buffer[50];
  
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
@@ -78,14 +80,19 @@ int main(int argc, char *argv[]) {
     // stream TCP
     // 0 se adecua a ipv4 y tcp
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    printf("%d---\n", fd);
 
     servDir.sin_family = AF_INET;
-    servDir.sin_port = htons(5000); 
+    servDir.sin_port = htons(puertoS); 
 
     inet_pton(AF_INET, ipServidor, &servDir.sin_addr);
         
     connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
+
+    sprintf(buffer, "%d %d\n", fila, columna);
+
+    write(fd, buffer, sizeof(buffer));
+
+    
 
 
 
