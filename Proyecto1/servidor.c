@@ -21,14 +21,15 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in servDir, clienteDir;
 
     char buffer[50];
-    int* nbuff;
+    //int* nbuff;
     //char* aux;
 
     int vagon[10][4];
     int contador = 40;
+    int cbuff;
 
     for (i = 0; i < 10; ++i) 
-        for (j = 0; i < 4; ++i)
+        for (j = 0; j < 4; ++j)
             vagon[i][j] = 0;
 
    
@@ -98,27 +99,46 @@ int main(int argc, char *argv[]) {
     // parametro es la cantidad de peticiones que se pueden encolar
     listen(fd, 40);
 
-    nuevoCliente = accept(fd, (struct sockaddr *) &clienteDir, &tamCliente);
+    while (1) {
 
-    read(nuevoCliente, buffer, sizeof(buffer));
-    printf("%s\n", buffer);
+        nuevoCliente = accept(fd, (struct sockaddr *) &clienteDir, &tamCliente);
 
-    i = atoi(strtok(buffer," "));
-    printf("%d--", i);
-    j = atoi(strtok(NULL," "));
-    printf("%d--", j);
+        read(nuevoCliente, buffer, sizeof(buffer));
 
-    if (vagon[i][j] == 0) {
-        nbuff = 0;
-        write(nuevoCliente, &nbuff, sizeof(nbuff));
+        i = atoi(strtok(buffer," "));
+        printf("%d--", i);
+        j = atoi(strtok(NULL," "));
+        printf("%d--\n", j);
+
+        memset(buffer, 0, sizeof(buffer));
         
+        if (vagon[i][j] == 0) {
+            printf("reservado!\n");
+            vagon[i][j] = 1;
+            buffer[0] = '0';
+            buffer[1] = '\n';
+            --contador;
+            write(nuevoCliente, buffer, 2);
 
-    } else if (contador) {
+        } else if (contador) {
+            printf("Ocupado!\n");
+            buffer[0] = '1';
+            cbuff = 1;
+            for (i = 0; i < 10; ++i) {
+                for (j = 0; j < 4; ++j) {
+                    buffer[cbuff] = (vagon[i][j] == 0) ?  '0' : '1';
+                    ++cbuff;
+                }
+            }
+            buffer[cbuff] = '\n';
+            write(nuevoCliente, buffer, sizeof(buffer));
 
-
-
-    } else {
-        //write(nuevoCliente, )
+        } else {
+            printf("Lleno!\n");
+            buffer[0] = '2';
+            buffer[1] = '\n';
+            write(nuevoCliente, buffer, 2);
+        }
     }
 
 
