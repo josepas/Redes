@@ -16,30 +16,39 @@ main (int argc, char *argv[])
 	respuesta *resultado;
 	par asiento;
 
-	if (argc < 2) {
-		printf ("usage: %s server_host\n", argv[0]);
+	if (argc < 4) {
+		printf ("Uso: %s ip_servidor fila columna\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];
 	cl = clnt_create(host, TREN_PROG, TREN_VERS, "tcp");
 
-	asiento[0] = 0;
-	asiento[1] = 0;
+	asiento[0] = atoi(argv[2]);
+	asiento[1] = atoi(argv[3]);
 	if (cl == NULL) {
 		clnt_pcreateerror(host);
 		exit(1);
 	}
 	resultado = reservar_1(asiento, cl);
-	for (i = 0; i < 10; ++i)
+	if (!resultado->codigo)
 	{
-		for (j = 0; j < 4; ++j)
+		printf("El puesto ha sido reservado exitosamente.\n");
+	} else if (resultado->codigo == 1)
+	{
+		for (i = 0; i < 10; ++i)
 		{
-			printf( "%c ", resultado->disponibles[i*10+j] );
+			for (j = 0; j < 4; ++j)
+			{
+				printf( "%c ", resultado->disponibles[i*4+j] );
+			}
+			printf("\n");
 		}
-		printf("\n");
+	} else if (resultado->codigo == 2)
+	{
+		printf("El tren está lleno.\n");
+	} else {
+		printf("Mensaje corrupto.\n");
+		exit(1);
 	}
-
-
-
 exit (0);
 }

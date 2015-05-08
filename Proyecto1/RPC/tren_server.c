@@ -11,17 +11,24 @@ reservar_1_svc(int *argp, struct svc_req *rqstp)
 {
 	int i,j;
 	static respuesta  result;
-	static int vagon [10][4];
+	static int vagon [10][4] = {0};
+	static int cont = 40;
 
-
-
-
-
-	result.codigo = 1;
-	for (i = 0; i < 10; ++i)
-		for (j = 0; j < 4; ++j)
-			result.disponibles[i*10+j] = vagon[i][j] ? 'X' : '0'; 
-
+	if (!vagon[argp[0]][argp[1]])
+	{
+		vagon[argp[0]][argp[1]] = 1;
+		cont--;
+		result.codigo = 0;
+	} else if (cont)
+	{
+		result.codigo = 1;
+		for (i = 0; i < 10; ++i)
+			for (j = 0; j < 4; ++j)
+				result.disponibles[i*4+j] = vagon[i][j] ? 'X' : '0'; 
+				
+	} else {
+		result.codigo = 2;
+	}
 
 	return &result;
 }

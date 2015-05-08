@@ -10,4 +10,4 @@ program TREN_PROG {
 	version TREN_VERS {
 		respuesta RESERVAR(par)=1;
 	}= 1 ;
-}= 0x200000001;
+}= 0x20000001;

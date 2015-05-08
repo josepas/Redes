@@ -22,7 +22,7 @@ struct respuesta {
 };
 typedef struct respuesta respuesta;
 
-#define TREN_PROG 0x200000001
+#define TREN_PROG 0x20000001
 #define TREN_VERS 1
 
 #if defined(__STDC__) || defined(__cplusplus)
