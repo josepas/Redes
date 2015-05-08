@@ -17,7 +17,7 @@ main (int argc, char *argv[])
 	par asiento;
 
 	if (argc < 4) {
-		printf ("Uso: %s ip_servidor fila columna\n", argv[0]);
+		printf ("Uso: %s ip_servidor -f fila -c columna\n", argv[0]);
 		exit (1);
 	}
 	host = argv[1];

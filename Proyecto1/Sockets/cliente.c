@@ -10,26 +10,37 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+
+void uso() {
+    printf("Uso: reserva_bol_cli <ip-servidor> -f fila -c columna -p puerto \n");
+    printf("\n");
+    printf("-h  Muestra esta informacion de uso.\n");
+    printf("-p  puerto por el cual el cliente enviara la peticion.\n");
+    printf("-f  fila que el cliente desea reservar.\n");
+    printf("-c  columna que el cliente desea reservar.\n");
+    return;
+}
+
 int chequeo(int fila, int columna) {
     if (columna > 4 || columna < 1) {
-        printf("Error parametro columna\n");
-        printf("%d\n", columna );
+        fprintf(stderr, "Error: la columna debe estar entre 1 y 4.\n");
         return 1;
     }
 
     if (fila > 10 || fila < 1) {
-        printf("Error parametro fila\n");
+        fprintf(stderr, "Error: la fila debe estar entre 1 y 10.\n");
         return 1;
     }
     return 0;
 }
 
-
 int main(int argc, char *argv[]) {
 
     int c, i, j;
-    int fila = -1, columna = -1, puertoS = -1;
+    int fila = -1, columna = -1, puertoS = 0;
     char* ipServidor = argv[1];
+
+    char* sobrante;
 
     struct sockaddr_in servDir;
     int fd;
@@ -45,21 +56,36 @@ int main(int argc, char *argv[]) {
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
         switch (c) {
             case 'h':
-                printf("reserva_bol_cli <ip-servidor> [-p puerto de servicio] [-f fila] [-c columna]\n");
-                printf("\n");
-                printf("-h  Muestra esta informacion de uso.\n");
-                printf("-p  puerto por el cual el cliente enviara la peticion.\n");
-                printf("-f  fila que el cliente desea reservar.\n");
-                printf("-c  columna que el cliente desea reservar.\n");
+                uso();
                 exit(0);
             case 'p':
-                puertoS = atoi(optarg);
+                puertoS = strtol(optarg,&sobrante,10); 
+                if (optarg == sobrante)
+                {
+                    fprintf(stderr, "Error: el parametro puerto debe ser un entero.\n");
+                    printf("\n");
+                    uso();
+                    exit (1);
+                }
                 break;
             case 'f':
-                fila = atoi(optarg);
+                fila = strtol(optarg,&sobrante,10);
+                if (optarg == sobrante)
+                {
+                    fprintf(stderr, "Error: el parametro fila debe ser un entero.\n");
+                    uso();
+                    exit (1);
+                }
                 break;
             case 'c':
-                columna = atoi(optarg);
+                columna = strtol(optarg,&sobrante,10);
+                if (optarg == sobrante)
+                {
+                    fprintf(stderr, "Error: el parametro columna debe ser un entero.\n");
+                    printf("\n");
+                    uso();
+                    exit (1);
+                }
                 break;
             case '?':
                 if (optopt == 'p')
@@ -75,15 +101,28 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    if (!puertoS || !fila || !columna)
+    {
+        fprintf(stderr, "Error: el parametro puerto no es opcional.\n");
+        uso();
+        exit(1);
+    }
+
     if (puertoS > 65535 || puertoS < 1025) {
-        printf("Error parametro puerto\n");
+        fprintf(stderr, "Error: el puerto debe estar entre 1025 y 65535.\n");
+        uso();
+        exit(1);
+    }
+    
+    if (chequeo(fila,columna))
+    {
+        uso();
         exit(1);
     }
 
     atendido = 1;
     while (atendido) { 
 
-        if (chequeo(fila,columna)) exit(1);
 
         fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -106,7 +145,7 @@ int main(int argc, char *argv[]) {
             
         } else if (buffer[0] == '1') {
             printf("El puesto solicitado no esta disponible.\n");
-            printf("Acontinuacion, los puestos disponibles:\n");
+            printf("A continuacion los puestos disponibles:\n");
             cbuff = 1;
             printf("     1 2 3 4\n");
             for (i = 0; i < 10; ++i) {

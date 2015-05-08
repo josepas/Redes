@@ -32,3 +32,5 @@ Proyecto1/cliente
 
 # Debug files
 *.dSYM/
+Proyecto1/Sockets/cliente
+Proyecto1/Sockets/servidor
