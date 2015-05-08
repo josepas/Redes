@@ -11,7 +11,7 @@
 
 int main(int argc, char *argv[]) {
 
-    int c, i, j;
+    int c, i, j, n;
     int fila = -1, columna = -1, puertoS = 7000;
 
     int fd, nuevoCliente;
@@ -68,29 +68,44 @@ int main(int argc, char *argv[]) {
     }
 
     if (fila > 9 || fila < 0) {
-        printf("Error parametro fila\n");
+        printf("Error: parametro fila\n");
         exit(1);
     }
 
     if (puertoS > 65535 || puertoS < 1025) {
-        printf("Error parametro puerto\n");
+        printf("Error: parametro puerto\n");
         exit(1);
     }
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (fd < 0) {
+      perror("Error: fallo en apertura del socket");
+      exit(1);
+    }
 
     servDir.sin_family = AF_INET;
     servDir.sin_addr.s_addr = INADDR_ANY;
     servDir.sin_port = htons(puertoS); 
-    bind(fd, (struct sockaddr *)&servDir, sizeof(servDir));
+    if (bind(fd, (struct sockaddr *)&servDir, sizeof(servDir)) < 0) {
+        perror("Error: fallo en el nombramiento del socket");
+        exit(1);
+    }
 
     listen(fd, 40);
 
     while (1) {
 
         nuevoCliente = accept(fd, (struct sockaddr *) &clienteDir, &tamCliente);
+        if (nuevoCliente < 0) {
+            perror("Error: fallo al aceptar conexion con el cliente");
+            exit(1);
+        }
 
-        read(nuevoCliente, buffer, sizeof(buffer));
+        n = read(nuevoCliente, buffer, sizeof(buffer));
+        if (n < 0) {
+            perror("Error: fallo en lectura del socket");
+            exit(1);
+        }
 
         i = atoi(strtok(buffer," "));
         j = atoi(strtok(NULL," "));
@@ -102,7 +117,11 @@ int main(int argc, char *argv[]) {
             buffer[0] = '0';
             buffer[1] = '\n';
             --contador;
-            write(nuevoCliente, buffer, 2);
+            n = write(nuevoCliente, buffer, 2);
+            if (n < 0) {
+                perror("Error: fallo de escritura en el socket");
+                exit(1);
+            }
 
         } else if (contador) {
             printf("Ocupado! %d-%d\n", i, j);
@@ -115,13 +134,20 @@ int main(int argc, char *argv[]) {
                 }
             }
             buffer[cbuff] = '\n';
-            write(nuevoCliente, buffer, sizeof(buffer));
-
+            n = write(nuevoCliente, buffer, sizeof(buffer));
+            if (n < 0) {
+                perror("Error: fallo de escritura en el socket");
+                exit(1);
+            }
         } else {
             printf("Vagon lleno!\n");
             buffer[0] = '2';
             buffer[1] = '\n';
-            write(nuevoCliente, buffer, 2);
+            n = write(nuevoCliente, buffer, 2);
+            if (n < 0) {
+                perror("Error: fallo de escritura en el socket");
+                exit(1);
+            }
         }
     }
 
