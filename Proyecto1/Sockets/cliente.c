@@ -36,21 +36,21 @@ int chequeo(int fila, int columna) {
 int main(int argc, char *argv[]) {
 
     int c, i, j;
-    int fila = 0, columna = 0, puertoS = 0;
-    char* ipServidor = argv[1];
+    int fila = 0;
+    int columna = 0;
+    int puertoS = 0;
 
+    char* ipServidor = argv[1];
     char* sobrante;
 
-    struct sockaddr_in servDir;
     int fd;
+    struct sockaddr_in servDir;
 
     char buffer[50];
     int cbuff;
 
     int atendido;
 
-
- 
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
         switch (c) {
@@ -59,8 +59,7 @@ int main(int argc, char *argv[]) {
                 exit(0);
             case 'p':
                 puertoS = strtol(optarg,&sobrante,10); 
-                if (optarg == sobrante)
-                {
+                if (optarg == sobrante) {
                     fprintf(stderr, "Error: el parametro puerto debe ser un entero.\n");
                     printf("\n");
                     uso();
@@ -69,8 +68,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'f':
                 fila = strtol(optarg,&sobrante,10);
-                if (optarg == sobrante)
-                {
+                if (optarg == sobrante) {
                     fprintf(stderr, "Error: el parametro fila debe ser un entero.\n");
                     uso();
                     exit (1);
@@ -78,8 +76,7 @@ int main(int argc, char *argv[]) {
                 break;
             case 'c':
                 columna = strtol(optarg,&sobrante,10);
-                if (optarg == sobrante)
-                {
+                if (optarg == sobrante) {
                     fprintf(stderr, "Error: el parametro columna debe ser un entero.\n");
                     printf("\n");
                     uso();
@@ -100,8 +97,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (!puertoS)
-    {
+    if (!puertoS) {
         fprintf(stderr, "Error: el parametro puerto no es opcional.\n");
         uso();
         exit(1);
@@ -113,8 +109,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     
-    if (chequeo(fila,columna))
-    {
+    if (chequeo(fila,columna)) {
         uso();
         exit(1);
     }
@@ -124,6 +119,10 @@ int main(int argc, char *argv[]) {
 
 
         fd = socket(AF_INET, SOCK_STREAM, 0);
+ 		if (fd < 0) {
+	      perror("Error: fallo en apertura del socket");
+	      exit(1);
+      	}
 
         servDir.sin_family = AF_INET;
         servDir.sin_port = htons(puertoS); 
