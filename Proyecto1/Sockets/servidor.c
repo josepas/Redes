@@ -1,6 +1,7 @@
 /*  servidor.c 
  *      Implementacion usando sockets del servidor
  *      con modelo cliente-servidor
+ *  
  *  Autores:
  *      Gustavo Gutierrez   11-10428
  *      Jose Pascarella     11-10743
@@ -157,7 +158,6 @@ int main(int argc, char *argv[]) {
          * El cliente reserva un puesto ocupado
          */
         } else if (contador) {
-            printf("Ocupado! %d-%d\n", i, j);
             buffer[0] = '1';
             cbuff = 1;
             for (i = 0; i < 10; ++i) {
@@ -176,7 +176,6 @@ int main(int argc, char *argv[]) {
          * El cliente reserva cuando el vagon esta lleno
          */
         } else {
-            printf("Vagon lleno!\n");
             buffer[0] = '2';
             buffer[1] = '\n';
             n = write(nuevoCliente, buffer, 2);

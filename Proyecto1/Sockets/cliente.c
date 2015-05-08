@@ -1,3 +1,15 @@
+/*  cliente.c 
+ *      Implementacion usando sockets del cliente
+ *      con modelo cliente-servidor
+ * 
+ *  Autores:
+ *      Gustavo Gutierrez   11-10428
+ *      Jose Pascarella     11-10743
+ *
+ *  Ultima Modificacion:
+ *      8 / 05 / 2015
+ */
+
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,7 +21,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
+/*
+ * Especificaciones de uso del cliente
+ */
 void uso() {
     printf("Uso: reserva_bol_cli <ip-servidor> -f fila -c columna -p puerto \n");
     printf("\n");
@@ -20,6 +34,15 @@ void uso() {
     return;
 }
 
+/* 
+ * Parametros:
+ *  fila     Numero de fila del asiento a reservar
+ *  columna  Numero de columna del asiento a reservar
+ *
+ * Retorna
+ *  0 si el chequeo es correcto
+ *  1 si el chequeo es incorrecto 
+ */
 int chequeo(int fila, int columna) {
     if (columna > 4 || columna < 1) {
         fprintf(stderr, "Error: debe especificar una columna entre 1 y 4.\n");
@@ -35,22 +58,27 @@ int chequeo(int fila, int columna) {
 
 int main(int argc, char *argv[]) {
 
-    int c, i, j;
-    int fila = 0;
-    int columna = 0;
-    int puertoS = 0;
+    int c;               // Chequeos
+    int i, j;               // Iteradores
+    int fila = 0;           // Numero de Fila del asiento
+    int columna = 0;        // Numero de Columna del asiento
+    int puertoS = 0;        // Puerto de comunicacion con el servidor
+    //int numIntentos = 3;     Cantidad de intentos de conexion con el servidor
 
-    char* ipServidor = argv[1];
-    char* sobrante;
+    char* ipServidor = argv[1]; // IP del servidor
+    char* sobrante;             // Chequeo
 
-    int fd;
-    struct sockaddr_in servDir;
+    int fd;                     // File Descriptor del socket
+    struct sockaddr_in servDir; // Socket nombrado del servidor
 
-    char buffer[50];
-    int cbuff;
+    char buffer[50];    // Buffer para enviar y recibir mensajes
+    int cbuff;          // Auxiliar para escribir en el buffer
 
-    int atendido;
+    int atendido;       // Chequeo de atencion de la peticion
 
+    /*
+     * Manejo de parametros
+     */
     opterr = 0;
     while ((c = getopt (argc, argv, "hp:f:c:")) != -1) {
         switch (c) {
@@ -84,11 +112,7 @@ int main(int argc, char *argv[]) {
                 }
                 break;
             case '?':
-                if (optopt == 'p')
-                    fprintf (stderr, "Opcion -%c requiere un argumento.\n", optopt);
-                else if (optopt == 'f')
-                    fprintf (stderr, "Opcion -%c requiere un argumento.\n", optopt);
-                else if (optopt == 'c')
+                if (optopt == 'p' || optopt == 'f' || optopt == 'c')
                     fprintf (stderr, "Opcion -%c requiere un argumento.\n", optopt);
                 else
                     fprintf (stderr, "Opcion desconocida -%c.\n", optopt);
@@ -97,6 +121,9 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    /*
+     * Chequeo de la entrada
+     */
     if (!puertoS) {
         fprintf(stderr, "Error: el parametro puerto no es opcional.\n");
         uso();
@@ -114,10 +141,13 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
+
     atendido = 1;
     while (atendido) { 
 
-
+        /*
+         * Creacion del socket y conexion con el servidor
+         */
         fd = socket(AF_INET, SOCK_STREAM, 0);
  		if (fd < 0) {
 	      perror("Error: fallo en apertura del socket");
@@ -131,12 +161,25 @@ int main(int argc, char *argv[]) {
         connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
 
         sprintf(buffer, "%d %d\n", fila-1, columna-1);
-        write(fd, buffer, sizeof(buffer));
+        
+        if ( write(fd, buffer, sizeof(buffer)) < 0 ) {
+            perror("Error: fallo de escritura en el socket");
+            exit(1);
+        }
 
         memset(buffer, 0, sizeof(buffer));
 
-        read(fd, buffer, sizeof(buffer));
+        if (read(fd, buffer, sizeof(buffer)) < 0) {
+            perror("Error: fallo de lectura en el socket");
+            exit(1);
+        }
 
+        /*
+         * Manejo de las respuestas del servidor
+         *  Cabezera 0 reservado con exito
+         *  Cabezera 1 puesto ocupado, mostrar matriz y nueva reserva
+         *  Cabezera 2 vagon lleno 
+         */
         if (buffer[0] == '0') {
             printf("El puesto solicitado fila:%d Columna:%d ha sido reservado con exito!\n", fila, columna);
             atendido = 0;
@@ -144,6 +187,7 @@ int main(int argc, char *argv[]) {
         } else if (buffer[0] == '1') {
             printf("El puesto solicitado no esta disponible.\n");
             printf("A continuacion los puestos disponibles:\n");
+            
             cbuff = 1;
             printf("     1 2 3 4\n");
             for (i = 0; i < 10; ++i) {
