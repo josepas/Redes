@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -23,12 +22,12 @@ void uso() {
 
 int chequeo(int fila, int columna) {
     if (columna > 4 || columna < 1) {
-        fprintf(stderr, "Error: la columna debe estar entre 1 y 4.\n");
+        fprintf(stderr, "Error: debe especificar una columna entre 1 y 4.\n");
         return 1;
     }
 
     if (fila > 10 || fila < 1) {
-        fprintf(stderr, "Error: la fila debe estar entre 1 y 10.\n");
+        fprintf(stderr, "Error: debe especificar una fila entre 1 y 10.\n");
         return 1;
     }
     return 0;
@@ -37,7 +36,7 @@ int chequeo(int fila, int columna) {
 int main(int argc, char *argv[]) {
 
     int c, i, j;
-    int fila = -1, columna = -1, puertoS = 0;
+    int fila = 0, columna = 0, puertoS = 0;
     char* ipServidor = argv[1];
 
     char* sobrante;
@@ -101,7 +100,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (!puertoS || !fila || !columna)
+    if (!puertoS)
     {
         fprintf(stderr, "Error: el parametro puerto no es opcional.\n");
         uso();
