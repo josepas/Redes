@@ -44,12 +44,12 @@ void uso() {
  *  1 si el chequeo es incorrecto 
  */
 int chequeo(int fila, int columna) {
-    if (columna > 4 || columna < 1) {
+    if (columna < 1) {
         fprintf(stderr, "Error: debe especificar una columna entre 1 y 4.\n");
         return 1;
     }
 
-    if (fila > 10 || fila < 1) {
+    if (fila < 1) {
         fprintf(stderr, "Error: debe especificar una fila entre 1 y 10.\n");
         return 1;
     }
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     int fd;                     // File Descriptor del socket
     struct sockaddr_in servDir; // Socket nombrado del servidor
 
-    char buffer[50];    // Buffer para enviar y recibir mensajes
+    char buffer[1000];    // Buffer para enviar y recibir mensajes
     int cbuff;          // Auxiliar para escribir en el buffer
 
     int atendido;       // Chequeo de atencion de la peticion
@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 
         connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
 
-        sprintf(buffer, "%d %d\n", fila-1, columna-1);
+        sprintf(buffer, "%d %d\n", fila, columna);
         
         if ( write(fd, buffer, sizeof(buffer)) < 0 ) {
             perror("Error: fallo de escritura en el socket");
@@ -187,17 +187,20 @@ int main(int argc, char *argv[]) {
         } else if (buffer[0] == '1') {
             printf("El puesto solicitado no esta disponible.\n");
             printf("A continuacion los puestos disponibles:\n");
+            cbuff = 3;
             
-            cbuff = 1;
-            printf("     1 2 3 4\n");
-            for (i = 0; i < 10; ++i) {
+            printf("     1 ");
+            for (i = 0; i < buffer[2]-1; i++)
+                printf("%*d ", 2, i+2);
+                printf("\n");    
+            
+            for (i = 0; i < buffer[1]; ++i) {
                 printf(" %*d  ", 2, i+1);
-                for (j = 0; j < 4; ++j) {
-                    buffer[cbuff] == '0' ? printf("\x1b[32m" "%c ", buffer[cbuff]) : printf("\x1b[31m" "X ");
-                    printf("\x1b[0m");
+                for (j = 0; j < buffer[2]; ++j) {
+                    buffer[cbuff] == '0' ? printf("\x1b[32m" "%c  ", buffer[cbuff]) : printf("\x1b[31m" "X  ");
                     ++cbuff;
                 }
-                printf("\n");
+                printf("\x1b[0m" "\n");
             }
 
             printf("Elija un nuevo asiento (fila columna): ");
@@ -211,6 +214,10 @@ int main(int argc, char *argv[]) {
 
         } else if (buffer[0] == '2') {
             printf("El vagon se encuntra lleno, intente en otro viaje.\n");
+            atendido = 0;
+        } else if (buffer[0] == '3') {
+            printf("El asiento (%d %d) solicitado es invalido.\n", fila, columna);
+            printf("El vagon es de dimensiones (%d %d).\n", buffer[1], buffer[2]);
             atendido = 0;
         }
     }

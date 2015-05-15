@@ -34,19 +34,13 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in servDir;     // Socket nombrado del Servidor
     struct sockaddr_in clienteDir;  // Socket nombrado del Cliente
 
-    char buffer[50];    // Buffer para enviar y recibir
+    char buffer[1000];    // Buffer para enviar y recibir
     int cbuff;          // Auxiliar para llenar el buffer
 
-    int vagon[10][4];   // Matriz de asientos disponibles
+    int** vagon;   // Matriz de asientos disponibles
     int contador = 40;  // Cantidad de puestos disponibles
 
-    /*
-     * Inicializacion de la matriz
-     */
-    for (i = 0; i < 10; ++i) 
-        for (j = 0; j < 4; ++j)
-            vagon[i][j] = 0;
-
+    
     /*
      * Manejo de parametros
      */
@@ -65,10 +59,10 @@ int main(int argc, char *argv[]) {
                 puertoS = atoi(optarg);
                 break;
             case 'f':
-                fila = atoi(optarg) - 1;
+                fila = atoi(optarg);
                 break;
             case 'c':
-                columna = atoi(optarg) - 1;
+                columna = atoi(optarg);
                 break;
             case '?':
                 if (optopt == 'p' || optopt == 'f' || optopt == 'c')
@@ -83,12 +77,12 @@ int main(int argc, char *argv[]) {
     /*
      * Chequeo de la entrada
      */
-    if (columna > 3 || columna < 0) {
+    if (columna < 1) {
         printf("Error parametro columna\n");
         exit(1);
     }
 
-    if (fila > 9 || fila < 0) {
+    if (fila < 1) {
         printf("Error: parametro fila\n");
         exit(1);
     }
@@ -97,6 +91,21 @@ int main(int argc, char *argv[]) {
         printf("Error: parametro puerto\n");
         exit(1);
     }
+
+
+    // Matriz del vagon
+    vagon = (int **) malloc(sizeof(int *) * fila);
+    for (i = 0; i < fila; ++i) 
+        vagon[i] = (int *) malloc(sizeof(int)*columna);
+
+
+    /*
+     * Inicializacion de la matriz
+     */
+    for (i = 0; i < fila; ++i)
+        for (j = 0; j < columna; ++j)
+            vagon[i][j] = 0;
+
 
     /*
      * Se crea el socket, se asocia a un puerto 
@@ -135,11 +144,27 @@ int main(int argc, char *argv[]) {
             exit(1);
         }
 
-        i = atoi(strtok(buffer," "));
-        j = atoi(strtok(NULL," "));
+        i = atoi(strtok(buffer," ")) - 1;
+        j = atoi(strtok(NULL," ")) - 1;
 
         memset(buffer, 0, sizeof(buffer));
-        
+
+
+        /*
+         * Chequeo de asiento solicitado invalido
+         */
+        if (i > fila - 1 || j > columna - 1) {
+            buffer[0] = '3';
+            buffer[1] = (char) fila;
+            buffer[2] = (char) columna; 
+            n = write(nuevoCliente, buffer, 4);
+            if (n < 0) {
+                perror("Error: fallo de escritura en el socket");
+                exit(1);
+            }
+            continue;
+        }
+
         /*
          * El cliente reserva un puesto valido.
          */
@@ -159,9 +184,11 @@ int main(int argc, char *argv[]) {
          */
         } else if (contador) {
             buffer[0] = '1';
-            cbuff = 1;
-            for (i = 0; i < 10; ++i) {
-                for (j = 0; j < 4; ++j) {
+            buffer[1] = (char) fila;
+            buffer[2] = (char) columna; 
+            cbuff = 3;
+            for (i = 0; i < fila; ++i) {
+                for (j = 0; j < columna; ++j) {
                     buffer[cbuff] = (vagon[i][j] == 0) ?  '0' : '1';
                     ++cbuff;
                 }
