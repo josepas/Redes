@@ -215,9 +215,10 @@ int main(int argc, char *argv[]) {
         } else if (buffer[0] == '2') {
             printf("El vagon se encuntra lleno, intente en otro viaje.\n");
             atendido = 0;
+        
         } else if (buffer[0] == '3') {
             printf("El asiento (%d %d) solicitado es invalido.\n", fila, columna);
-            printf("El vagon es de dimensiones (%d %d).\n", buffer[1], buffer[2]);
+            printf("El vagon es de dimensiones (%dx%d).\n", buffer[1], buffer[2]);
             atendido = 0;
         }
     }
