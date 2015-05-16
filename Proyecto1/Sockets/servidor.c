@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in servDir;     // Socket nombrado del Servidor
     struct sockaddr_in clienteDir;  // Socket nombrado del Cliente
 
-    char buffer[1000];    // Buffer para enviar y recibir
+    char buffer[1024];    // Buffer para enviar y recibir
     int cbuff;          // Auxiliar para llenar el buffer
 
     int** vagon;   // Matriz de asientos disponibles
@@ -89,6 +89,13 @@ int main(int argc, char *argv[]) {
 
     if (puertoS > 65535 || puertoS < 1025) {
         printf("Error: parametro puerto\n");
+        printf("Usar puertos bien conocidos es invalido.\n");
+        exit(1);
+    }
+
+    if (fila * columna > 1000) {
+        printf("Tamano de vagon invalido.\n");
+        printf("El vagon maximo soportado es de 1000 asientos.\n");
         exit(1);
     }
 
@@ -105,7 +112,6 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < fila; ++i)
         for (j = 0; j < columna; ++j)
             vagon[i][j] = 0;
-
 
     /*
      * Se crea el socket, se asocia a un puerto 

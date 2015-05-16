@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     int fila = 0;           // Numero de Fila del asiento
     int columna = 0;        // Numero de Columna del asiento
     int puertoS = 0;        // Puerto de comunicacion con el servidor
-    //int numIntentos = 3;     Cantidad de intentos de conexion con el servidor
+    int numIntentos = 3;    //Cantidad de intentos de conexion con el servidor
 
     char* ipServidor = argv[1]; // IP del servidor
     char* sobrante;             // Chequeo
@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
     int fd;                     // File Descriptor del socket
     struct sockaddr_in servDir; // Socket nombrado del servidor
 
-    char buffer[1000];    // Buffer para enviar y recibir mensajes
+    char buffer[1024];    // Buffer para enviar y recibir mensajes
     int cbuff;          // Auxiliar para escribir en el buffer
 
     int atendido;       // Chequeo de atencion de la peticion
@@ -158,7 +158,17 @@ int main(int argc, char *argv[]) {
         servDir.sin_port = htons(puertoS); 
         inet_pton(AF_INET, ipServidor, &servDir.sin_addr);
 
-        connect(fd, (struct sockaddr *)&servDir, sizeof(servDir));
+        i = 0;
+        while (i < numIntentos) {
+            if ( connect(fd, (struct sockaddr *)&servDir, sizeof(servDir)) != -1 ) {
+                i = numIntentos + 1;
+            ++i;
+        }
+
+        if (i == numIntentos) {
+            printf("Fallo de conexion con el servidor.\n");
+            exit(1);
+        }
 
         sprintf(buffer, "%d %d\n", fila, columna);
         
@@ -217,7 +227,7 @@ int main(int argc, char *argv[]) {
             atendido = 0;
         
         } else if (buffer[0] == '3') {
-            printf("El asiento (%d %d) solicitado es invalido.\n", fila, columna);
+            printf("El asiento solicitado fila:%d Columna:%d es invalido.\n", fila, columna);
             printf("El vagon es de dimensiones (%dx%d).\n", buffer[1], buffer[2]);
             atendido = 0;
         }
