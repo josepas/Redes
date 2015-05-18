@@ -1,3 +1,15 @@
+/*  cliente.c 
+ *      Implementacion usando sockets del cliente
+ *      con modelo cliente-servidor
+ * 
+ *  Autores:
+ *      Gustavo Gutierrez   11-10428
+ *      Jose Pascarella     11-10743
+ *
+ *  Ultima Modificacion:
+ *      8 / 05 / 2015
+ */
+
 #include <stdio.h>
 #include <unistd.h>
 #include "tren.h"
@@ -28,6 +40,7 @@ int main (int argc, char *argv[]) {
 
     int i,j;                // Iteradores de ciclos.
     int c;                  // Chequeo de opciones
+    int numIntentos = 3;    // Intentos de conexion con el servidor
     CLIENT *cl;             // Cliente de RPC
     char *host;             // IP de la máquina donde se encuentra el servidor
     char* sobrante;         // Chequeo de parametros
@@ -84,14 +97,24 @@ int main (int argc, char *argv[]) {
         exit (1);
     }
 
-    /* Creacion del cliente de RPC */
-
-    cl = clnt_create(host, TREN_PROG, TREN_VERS, "tcp");
-    if (cl == NULL) {
-        clnt_pcreateerror(host);
-        uso();
-        exit(1);
+    /* Creacion del cliente de RPC 
+     * Se realizan varios intentos de conexion
+     */
+    i = 0;
+    while (i < numIntentos) {
+        cl = clnt_create(host, TREN_PROG, TREN_VERS, "tcp");
+        if (cl != NULL) {
+            break;
+        }
+        i++;
+        printf("Intento fallido: %d \n",i );
+        sleep(2);
     }
+
+    if (i == numIntentos) {
+           printf("Fallo de conexion con el servidor.\n");
+           exit(1);
+       }
 
     /* Llamada a la funcion y procesamiento de resultado. */
 

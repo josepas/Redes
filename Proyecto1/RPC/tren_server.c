@@ -1,3 +1,15 @@
+/*  cliente.c 
+ *      Implementacion usando sockets del cliente
+ *      con modelo cliente-servidor
+ * 
+ *  Autores:
+ *      Gustavo Gutierrez   11-10428
+ *      Jose Pascarella     11-10743
+ *
+ *  Ultima Modificacion:
+ *      8 / 05 / 2015
+ */
+
 #include "tren.h"
 
 respuesta * reservar_1_svc(int *argp, struct svc_req *rqstp)
