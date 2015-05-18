@@ -107,7 +107,6 @@ int main (int argc, char *argv[]) {
             break;
         }
         i++;
-        printf("Intento fallido: %d \n",i );
         sleep(2);
     }
 
