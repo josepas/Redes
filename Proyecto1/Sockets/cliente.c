@@ -160,7 +160,7 @@ int main(int argc, char *argv[]) {
 
         i = 0;
         while (i < numIntentos) {
-            if ( connect(fd, (struct sockaddr *)&servDir, sizeof(servDir)) != -1 ) {
+            if ( connect(fd, (struct sockaddr *)&servDir, sizeof(servDir)) != -1 )
                 i = numIntentos + 1;
             ++i;
         }
