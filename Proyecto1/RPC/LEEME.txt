@@ -1,0 +1,69 @@
+Gustavo Gutiérrez   11-10428
+José Pascarella     11-10743
+
+18 / 05 / 2015
+
+LEEME del archivo tar.gz de la implementación de RPC del miniproyecto 1.
+
+Contiene:
+
+    - tren.x: archivo que describe el protocolo a utilizar. Se usa el archivo para 
+    generar los archivos stub con el comando rpcgen.
+
+    - Makefile.tren: Makefile utilizado por el comando make para compilar el cliente
+    y el servidor. Generado automáticamente por rpcgen.
+
+    - tren_clnt.c: especifica el stub del cliente. Generado automáticamente por
+    el comando rpcgen.
+
+    - tren_svc.c: especifica el stub del servidor. Generado automáticamente por 
+    el comando rpcgen.
+
+    - tren_xdr.c: especifica las rutinas XDR necesarias para convertir estructuras
+    de datos locales a un formato para transmitir por red. Este archivo es generado
+    automáticamente por rpcgen.
+
+    - tren.h: archivo header que contiene todas las definiciones comunes del cliente,
+    el servidor y sus respectivos stubs. Generado automáticamente por rpcgen.
+
+    - tren_server.c: archivo donde se especifica los procedimientos a realizar por el
+    servidor. El comando rpcgen generó una plantilla la cual fue modificada con la
+    implementación de las rutinas.
+
+    - tren_client.c: archivo donde se especifica el código a ejecutar por el cliente,
+    el cual incluye llamadas a los procedimientos del servidor. El comando rpcgen 
+    generó una plantilla la cual fue modificada con la implementación del cliente.
+
+Que hace:
+
+    Modela el servicio de solicitud de asientos para un vagón de tren de 10x4. El cliente
+    realiza tres intentos para conectarse con el servidor, y una vez establecida la 
+    conexión envía la solicitud de un asiento. Los posibles resultados son:
+
+    Solicitud correcta: el puesto solicitado estaba disponible y fue reservado.
+    Solicitud factible: el puesto solicitado estaba ocupado pero existen otros puestos disponibles.
+    Solicitud imposible: no existen puestos disponibles en el vagón.
+
+Modificaciones con respecto a Sockets:
+
+    - En RPC se trabajó con un vagón fijo de 10x4. 
+    - Al no haber tamaño variable del vagón, el cliente verifica que los indices del puesto
+      solicitado son correctos, por lo que no existe la respuesta de solicitud incorrecta.
+    - En RPC no se especifica el puerto a través del cual se realizará la conexión.
+
+Como se ejecuta:
+
+    Primero se deben compilar los archivos fuentes usando el comando
+
+        $ make -f Makefile.tren
+
+    luego de que se crean los ejecutables, se levanta el servidor usando el ejecutable "tren_server":
+
+        $ ./tren_server
+
+    luego de que el servidor este escuchando en la maquina local o remotamente ya se pueden hacer 
+    solicitudes usando el ejecutable "tren_client"
+
+        $ ./tren_client <ip-servidor> -f fila -c columna 
+
+    El servidor respondera adecuadamene a la petición y el cliente mostrara el estado de la solicitud en pantalla
