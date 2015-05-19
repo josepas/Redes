@@ -1,0 +1,45 @@
+Gustavo Gutierrez   11-10428
+Jose Pascarella     11-10743
+
+18 / 05 / 2015
+
+LEEME del archivo tar.gz de la implementacion de sockets del miniproyecto 1.
+
+Contiene:
+
+    cliente.c
+        Contiene la implementacion del cliente del modelo cliente-servidor, desde el se solicita el asiento y se recibe e interpreta la respuesta del servidor.
+
+    servidor.c
+        Contiene la implementacion del servidor del modelo cliente-servidor, desde el se reciben las solicitudes concurrentes y se responde a los clientes dependiendo del caso.
+
+    Makefile:
+        Archivo auxiliar para la compilacion sencilla del proyecto.
+
+Que hace:
+    
+    Modela el servicio de solicitud de asientos para un vagon de tren de tamano variable, el cliente intenta establecer la conexion, de no ser posible en la primera vez, intentara dos veces mas, con un time-out de 3 minutos por intento, luego de que se conecta envia la solicitud al servidor, que la procesa y responde segun sea el caso.
+
+    Solicitud correcta: el puesto a reservar es valido y esta vacio
+    Solicutud incorrecta: el puesto a reservar esta ocupado pero quedan puestos vacios en el tren
+    Solicitud imposible: el vagon en el que se desea hacer la reserva esta lleno.
+    Solicitud invalida: el cliente reserva un puesto fuera de las dimensiones del vagon.
+
+Como se ejecuta:
+    
+    Primero se deben compilar los archivos fuentes usando el comando
+
+        $ make
+
+    luego de que se crean los ejecutables, es levanta el servidor usando el ejecutable "servidor":
+
+        $ ./servidor -f fila -c columna -p puerto
+
+    Cabe destacar que si no se usa un parametro para el puerto sera el especificado en el protocolo 7000. la maxima cantidad de asientos que puede haber en un vagon es de 1000, se recomienda usar una matriz (40*25) para la correcta visualizacion de los datos con 1000 puestos.
+
+    luego de que el servidor este escuchando en la maquina local o remotamente ya se pueden hacer solicitudes usando el ejecutable "cliente"
+
+        $ ./cliente <ip-servidor> -f fila -c columna -p puerto
+
+    El servidor respondera adecuandamene a la peticion y el servidor monstrara el estado de la solicitud en pantalla
+
